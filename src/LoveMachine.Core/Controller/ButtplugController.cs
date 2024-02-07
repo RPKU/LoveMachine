@@ -5,6 +5,7 @@ using Il2CppInterop.Runtime.Attributes;
 using LoveMachine.Core.Buttplug;
 using LoveMachine.Core.Game;
 using LoveMachine.Core.PlatformSpecific;
+using LoveMachine.Core.TCode;
 using UnityEngine;
 
 namespace LoveMachine.Core.Controller
@@ -19,6 +20,8 @@ namespace LoveMachine.Core.Controller
         [HideFromIl2Cpp]
         protected ButtplugWsClient Client { get; private set; }
         
+        protected TCodeDeviceConnecter Connecter { get; private set; }
+        
         [HideFromIl2Cpp]
         protected GameAdapter Game { get; private set; }
         
@@ -31,6 +34,7 @@ namespace LoveMachine.Core.Controller
             Client = GetComponent<ButtplugWsClient>();
             Game = GetComponent<GameAdapter>();
             analyzer = GetComponent<AnimationAnalyzer>();
+            Connecter = GetComponent<TCodeDeviceConnecter>();
             Game.OnHStarted += (s, a) => OnStartH();
             Game.OnHEnded += (s, a) => OnEndH();
             Client.OnDeviceListUpdated += (s, a) => Restart();

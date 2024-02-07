@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using LoveMachine.Core.Buttplug.Settings;
+using LoveMachine.Core.PlatformSpecific;
+using LoveMachine.Core.TCode;
 
 namespace LoveMachine.Core.Buttplug
 {
@@ -16,6 +18,7 @@ namespace LoveMachine.Core.Buttplug
 
         public bool IsVibrator => DeviceMessages.ScalarCmd?.Any(f => f.IsVibrator) ?? false;
         public bool IsConstrictor => DeviceMessages.ScalarCmd?.Any(f => f.IsConstrictor) ?? false;
+        public bool IsTcode => Globals.ManagerObject.GetComponent<TCodeDeviceConnecter>().IsConnected;
         public bool IsStroker => DeviceMessages.LinearCmd != null;
         public bool IsRotator => DeviceMessages.RotateCmd != null;
 

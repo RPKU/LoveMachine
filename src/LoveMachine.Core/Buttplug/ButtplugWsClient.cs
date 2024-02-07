@@ -6,6 +6,7 @@ using System.Linq;
 using LitJson;
 using LoveMachine.Core.Config;
 using LoveMachine.Core.PlatformSpecific;
+using LoveMachine.Core.TCode;
 using UnityEngine;
 using WebSocket4Net;
 
@@ -228,10 +229,24 @@ namespace LoveMachine.Core.Buttplug
 
         private void UpdateDeviceList(List<Device> newDevices)
         {
+            if (Globals.ManagerObject != null && Globals.ManagerObject.GetComponent<TCodeDeviceConnecter>().IsConnected)
+            {
+                newDevices.Add(NewTcodeDevice());
+            }
             var oldDevices = Devices;
             Devices = newDevices;
             var args = new DeviceListEventArgs(before: oldDevices, after: Devices);
             OnDeviceListUpdated.Invoke(this, args);
+        }
+
+        private Device NewTcodeDevice()
+        {
+            Device tCode = new Device();
+            tCode.DeviceName = "T-Code";
+            tCode.Settings.DeviceName = tCode.DeviceName;
+            tCode.Settings.UpdatesHz = 60;
+            tCode.Settings.LatencyMs = 20;
+            return tCode;
         }
         
         private IEnumerator RunReceiveLoop()

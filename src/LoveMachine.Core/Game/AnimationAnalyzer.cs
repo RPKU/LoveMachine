@@ -57,7 +57,9 @@ namespace LoveMachine.Core.Game
             {
                 Amplitude = result.Amplitude,
                 DurationSecs = animTimeSecs * normalizedStrokeDuration,
-                Completion = Mathf.InverseLerp(start, end, normalizedTime % 1f)
+                Completion = Mathf.InverseLerp(start, end, normalizedTime % 1f),
+                Pos = result.Pos,
+                Rot = result.Rot
             };
             return true;
         }
@@ -123,7 +125,8 @@ namespace LoveMachine.Core.Game
                         Bone = entry.Key,
                         PenisBase = penisBase,
                         Time = currentTime,
-                        RelativePos = penisBase.position - entry.Value.position
+                        RelativePos = penisBase.position - entry.Value.position,
+                        RelativeRot = Quaternion.Inverse(penisBase.rotation) * entry.Value.rotation.eulerAngles
                     });
                 samples.AddRange(newSamples);
                 if (pose != GetExactPose(girlIndex, Bone.Auto) || currentTime < startTime)
@@ -163,13 +166,14 @@ namespace LoveMachine.Core.Game
                 .OrderBy(sample => -(sample.RelativePos - crest.RelativePos).magnitude)
                 .First();
             var axis = crest.RelativePos - trough.RelativePos;
+            var rots = crest.RelativeRot - trough.RelativeRot;
             float GetDistance(Vector3 v) =>
                 Vector3.Project(v - trough.RelativePos, axis).magnitude;
             float amplitude = samples.Max(sample => GetDistance(sample.RelativePos));
             var nodes = samples.Select(sample => new Node
             {
                 Time = sample.Time,
-                Position = Mathf.InverseLerp(0f, amplitude, GetDistance(sample.RelativePos))
+                Position = Mathf.InverseLerp(0f, amplitude, GetDistance(sample.RelativePos)),
             });
             return new Result
             {
@@ -178,7 +182,9 @@ namespace LoveMachine.Core.Game
                 // Prefer bones that are close and move a lot. Being close is more important.
                 Preference = axis.magnitude == 0
                     ? float.PositiveInfinity
-                    : Mathf.Pow(trough.RelativePos.magnitude, 3f) / axis.magnitude
+                    : Mathf.Pow(trough.RelativePos.magnitude, 3f) / axis.magnitude,
+                Pos = axis,
+                Rot = rots
             };
         }
 
@@ -212,6 +218,7 @@ namespace LoveMachine.Core.Game
             public Transform PenisBase { get; set; }
             public float Time { get; set; }
             public Vector3 RelativePos { get; set; }
+            public Vector3 RelativeRot { get; set; }
         }
         
         private struct Node
@@ -225,6 +232,8 @@ namespace LoveMachine.Core.Game
             public float[] StrokeDelimiters { get; set; }
             public float Amplitude { get; set; }
             public float Preference { get; set; } // smaller is better
+            public Vector3 Pos { get; set; }
+            public Vector3 Rot { get; set; }
         }
     }
 }

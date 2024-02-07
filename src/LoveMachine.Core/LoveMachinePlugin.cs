@@ -4,6 +4,7 @@ using LoveMachine.Core.Config;
 using LoveMachine.Core.Controller;
 using LoveMachine.Core.Game;
 using LoveMachine.Core.PlatformSpecific;
+using LoveMachine.Core.TCode;
 using LoveMachine.Core.UI;
 
 namespace LoveMachine.Core
@@ -24,6 +25,7 @@ namespace LoveMachine.Core
             StrokerConfig.Initialize(this);
             RotatorConfig.Initialize(this);
             ConstrictConfig.Initialize(this);
+            TCodeDeviceConfig.Initialize(this);
             var manager = Globals.ManagerObject;
             manager.AddComponent<KillSwitch>();
             manager.AddComponent<TGame>();
@@ -35,6 +37,7 @@ namespace LoveMachine.Core
             manager.AddComponent<RotatorController>();
             manager.AddComponent<ConstrictController>();
             manager.AddComponent<DeviceListGUI>();
+            manager.AddComponent<TCodeDeviceConnecter>();
             GameHooks.InstallHooks();
         }
     }
